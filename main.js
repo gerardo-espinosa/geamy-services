@@ -14,19 +14,18 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // Contact form handler
-async function handleSubmit(e) {
-  e.preventDefault();
-  const form = e.target;
-  const btn = form.querySelector('button[type="submit"]');
+async function handleSubmit(event) {
+  event.preventDefault();
+  
+  const form = event.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const name = form.querySelector('#name') ? form.querySelector('#name').value : form.elements['name'].value;
+  const email = form.querySelector('#email') ? form.querySelector('#email').value : form.elements['email'].value;
+  const message = form.querySelector('#message') ? form.querySelector('#message').value : form.elements['message'].value;
 
-  // Read values by input type since inputs have no id/name
-  const name = form.querySelector('input[type="text"]').value;
-  const email = form.querySelector('input[type="email"]').value;
-  const message = form.querySelector('textarea').value;
-
-  const originalText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
 
   try {
     const response = await fetch('/api/send-email', {
@@ -38,21 +37,16 @@ async function handleSubmit(e) {
     const data = await response.json();
 
     if (response.ok && data.success) {
-      btn.textContent = '✓ Message Sent!';
-      btn.style.background = '#16a34a';
+      alert('Thank you! Your message has been sent successfully.');
       form.reset();
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.style.background = '';
-      }, 3000);
     } else {
-      alert('Sorry, there was an error sending your message. Please try again or email us directly.');
+      alert('Sorry, there was an error sending your message. Please try again or contact us directly.');
     }
   } catch (err) {
-    alert('Sorry, there was an error sending your message. Please try again or email us directly.');
+    alert('Sorry, there was an error sending your message. Please try again or contact us directly.');
   } finally {
-    btn.disabled = false;
-    if (btn.textContent === 'Sending...') btn.textContent = originalText;
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 }
 
