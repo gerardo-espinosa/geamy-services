@@ -18,9 +18,11 @@ async function handleSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const btn = form.querySelector('button[type="submit"]');
-  const name = form.querySelector('#name') ? form.querySelector('#name').value : form.elements['name'].value;
-  const email = form.querySelector('#email') ? form.querySelector('#email').value : form.elements['email'].value;
-  const message = form.querySelector('#message') ? form.querySelector('#message').value : form.elements['message'].value;
+
+  // Read values by input type since inputs have no id/name
+  const name = form.querySelector('input[type="text"]').value;
+  const email = form.querySelector('input[type="email"]').value;
+  const message = form.querySelector('textarea').value;
 
   const originalText = btn.textContent;
   btn.disabled = true;
