@@ -14,16 +14,44 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // Contact form handler
-function handleSubmit(e) {
+async function handleSubmit(e) {
   e.preventDefault();
-  const btn = e.target.querySelector('button[type="submit"]');
-  btn.textContent = '✓ Message Sent!';
-  btn.style.background = '#16a34a';
-  setTimeout(() => {
-    btn.textContent = 'Send Message';
-    btn.style.background = '';
-    e.target.reset();
-  }, 3000);
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  const name = form.querySelector('#name') ? form.querySelector('#name').value : form.elements['name'].value;
+  const email = form.querySelector('#email') ? form.querySelector('#email').value : form.elements['email'].value;
+  const message = form.querySelector('#message') ? form.querySelector('#message').value : form.elements['message'].value;
+
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      btn.textContent = '✓ Message Sent!';
+      btn.style.background = '#16a34a';
+      form.reset();
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+      }, 3000);
+    } else {
+      alert('Sorry, there was an error sending your message. Please try again or email us directly.');
+    }
+  } catch (err) {
+    alert('Sorry, there was an error sending your message. Please try again or email us directly.');
+  } finally {
+    btn.disabled = false;
+    if (btn.textContent === 'Sending...') btn.textContent = originalText;
+  }
 }
 
 // Smooth scroll for anchor links
