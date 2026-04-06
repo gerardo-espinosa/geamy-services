@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -25,7 +24,6 @@ export default async function handler(req, res) {
   const toEmail = 'gerardo@geamyservices.com';
 
   try {
-    // Step 1: Get access token
     const tokenRes = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -44,7 +42,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to get access token' });
     }
 
-    // Step 2: Send email via Microsoft Graph
     const emailRes = await fetch(`https://graph.microsoft.com/v1.0/users/${fromEmail}/sendMail`, {
       method: 'POST',
       headers: {
@@ -56,7 +53,13 @@ export default async function handler(req, res) {
           subject: `New Contact Form Message from ${name}`,
           body: {
             contentType: 'HTML',
-            content: `<h2>New message from your website contact form</h2><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Message:</strong></p><p>${message.replace(/\n/g, '<br>')}</p>`,
+            content: `
+              <h2>New message from your website contact form</h2>
+              <p><strong>Name:</strong> ${name}</p>
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Message:</strong></p>
+              <p>${message.replace(/\n/g, '<br>')}</p>
+            `,
           },
           toRecipients: [{ emailAddress: { address: toEmail } }],
           replyTo: [{ emailAddress: { address: email, name: name } }],
